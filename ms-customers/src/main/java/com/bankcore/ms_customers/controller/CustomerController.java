@@ -1,23 +1,31 @@
 package com.bankcore.ms_customers.controller;
 
 import com.bankcore.ms_customers.dto.request.CustomerRegisterRequest;
+import com.bankcore.ms_customers.dto.response.CustomerProfileResponse;
 import com.bankcore.ms_customers.dto.response.CustomerResponse;
 import com.bankcore.ms_customers.service.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/customers")
+@RequestMapping("/api/customers")
 @RequiredArgsConstructor
 public class CustomerController {
-    private final CustomerService service;
+    private final CustomerService customerService;
 
     @PostMapping("/register")
     public CustomerResponse register(@Valid @RequestBody CustomerRegisterRequest request) {
-        return service.register(request);
+        return customerService.register(request);
+    }
+    @GetMapping("/me")
+    public CustomerProfileResponse getMyProfile(Authentication authentication) {
+
+        UUID customerId = UUID.fromString(authentication.getName());
+
+        return customerService.getAuthenticatedCustomer(customerId);
     }
 }

@@ -1,6 +1,7 @@
 package com.bankcore.ms_customers.service.impl;
 
 import com.bankcore.ms_customers.dto.request.CustomerRegisterRequest;
+import com.bankcore.ms_customers.dto.response.CustomerProfileResponse;
 import com.bankcore.ms_customers.dto.response.CustomerResponse;
 import com.bankcore.ms_customers.entity.Customer;
 import com.bankcore.ms_customers.exception.ResourceAlreadyExistsException;
@@ -10,19 +11,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
-    private final CustomerRepository repository;
+    private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public CustomerResponse register(CustomerRegisterRequest request) {
-        if (repository.existsByEmail(request.email())) {
+        if (customerRepository.existsByEmail(request.email())) {
             throw new ResourceAlreadyExistsException("Email already registered");
         }
 
-        if (repository.existsByDni(request.dni())) {
+        if (customerRepository.existsByDni(request.dni())) {
             throw new ResourceAlreadyExistsException("DNI already registered");
         }
 
@@ -36,7 +39,7 @@ public class CustomerServiceImpl implements CustomerService {
                 encryptedPassword
         );
 
-        Customer saved = repository.save(customer);
+        Customer saved = customerRepository.save(customer);
 
         return new CustomerResponse(
                 saved.getId(),
@@ -46,6 +49,24 @@ public class CustomerServiceImpl implements CustomerService {
                 saved.getEmail(),
                 saved.getStatus().name(),
                 saved.getCreatedAt()
+        );
+    }
+
+    public CustomerProfileResponse getAuthenticatedCustomer(UUID customerId) {
+
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        return new CustomerProfileResponse(
+                customer.getId(),
+                customer.getDni(),
+                customer.getFirstName(),
+                customer.getLastName(),
+                customer.getEmail(),
+                customer.getPhone(),
+                customer.getAddress(),
+                customer.getStatus().name(),
+                customer.getCreatedAt()
         );
     }
 }
