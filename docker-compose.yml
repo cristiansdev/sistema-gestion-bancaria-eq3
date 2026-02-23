@@ -6,9 +6,9 @@ services:
     image: postgres:15
     container_name: postgres-customers
     environment:
-      POSTGRES_DB: customers_db
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: ${CUSTOMERS_DB}
+      POSTGRES_USER: ${CUSTOMERS_DB_USER}
+      POSTGRES_PASSWORD: ${CUSTOMERS_DB_PASSWORD}
     ports:
       - "5433:5432"
 
@@ -16,9 +16,9 @@ services:
     image: postgres:15
     container_name: postgres-accounts
     environment:
-      POSTGRES_DB: accounts_db
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: ${ACCOUNTS_DB}
+      POSTGRES_USER: ${ACCOUNTS_DB_USER}
+      POSTGRES_PASSWORD: ${ACCOUNTS_DB_PASSWORD}
     ports:
       - "5434:5432"
 
@@ -33,6 +33,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-customers:5432/customers_db
       SPRING_DATASOURCE_USERNAME: admin
       SPRING_DATASOURCE_PASSWORD: admin123
+      JWT_SECRET: ${JWT_SECRET}
 
   ms-accounts:
     build: ./ms-accounts
